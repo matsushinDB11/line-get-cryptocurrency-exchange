@@ -15,15 +15,6 @@ YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
-# class CoinZApi:
-#     def __init__(self):
-#         self.endpoint = 'https://api.coin.z.com/public'
-#         self.path = '/v1/ticker'
-#         self.symbol = ''
-#
-#     def set_symbol(self, symbol):
-#         self.symbol = symbol
-
 endpoint = 'https://api.coin.z.com/public'
 path = '/v1/ticker'
 symbol = 'BTC'
@@ -35,7 +26,7 @@ def make_symbol_path(symbol):
 
 @app.route('/')
 def index():
-    return 'second Page'
+    return 'first Page'
 
 
 @app.route('/btc')
