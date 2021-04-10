@@ -1,7 +1,7 @@
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, FollowEvent
 import os
 import requests
 import json
@@ -26,13 +26,44 @@ def make_symbol_path(symbol):
 
 @app.route('/')
 def index():
-    return 'first Page'
+    return 'line-get-cryptocurrency-exchange by Matsushin'
 
 
-@app.route('/btc')
-def re_json():
-    symbol_patth = make_symbol_path(symbol)
-    res = requests.get(endpoint + symbol_patth)
+@app.route("/callback", methods=['POST'])
+def callback():
+    # get X-Line-Signature header value
+    signature = request.headers['X-Line-Signature']
+
+    # get request body as text
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
+
+    # handle webhook body
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        print("Invalid signature. Please check your channel access token/channel secret.")
+        abort(400)
+
+    return 'OK'
+
+
+@handler.add(FollowEvent)
+def handle_follow(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text='初めまして 登録ありがとう')
+    )
+
+
+@handler.add(MessageEvent, message=TextMessage)
+def re_btc(event):
+    symbol_path = make_symbol_path(symbol)
+    res = requests.get(endpoint + symbol_path)
     ask = json.loads(res.text)["data"][0]["ask"]
     bid = json.loads(res.text)["data"][0]["bid"]
-    return '買値' + str(ask) + ' ' + '売値' + str(bid)
+    msg = '買値' + str(ask) + ' ' + '売値' + str(bid)
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=msg)
+    )
