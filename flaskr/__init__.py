@@ -1,7 +1,7 @@
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, FollowEvent
 import os
 import requests
 import json
@@ -48,10 +48,22 @@ def callback():
     return 'OK'
 
 
-@app.route('/btc')
-def re_json():
-    symbol_patth = make_symbol_path(symbol)
-    res = requests.get(endpoint + symbol_patth)
+@handler.add(FollowEvent)
+def handle_follow(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text='初めまして 登録ありがとう')
+    )
+
+
+@handler.add(MessageEvent, message=TextMessage)
+def re_btc(event):
+    symbol_path = make_symbol_path(symbol)
+    res = requests.get(endpoint + symbol_path)
     ask = json.loads(res.text)["data"][0]["ask"]
     bid = json.loads(res.text)["data"][0]["bid"]
-    return '買値' + str(ask) + ' ' + '売値' + str(bid)
+    msg = '買値' + str(ask) + ' ' + '売値' + str(bid)
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=msg)
+    )
