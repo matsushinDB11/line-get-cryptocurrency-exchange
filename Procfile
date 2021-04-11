@@ -1,1 +1,1 @@
-web: gunicorn flaskr/__init__.py:app --log-file -
+web: python ./flaskr/__init__.py
