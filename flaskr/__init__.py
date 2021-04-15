@@ -21,6 +21,7 @@ path = '/v1/ticker'
 
 
 def make_symbol_path(symbol):
+    """GMOコインAPIのパスを生成"""
     return path + '?symbol=' + symbol
 
 
@@ -30,6 +31,7 @@ def index():
 
 
 def get_manual():
+    """使い方"""
     msg = """暗号通貨のシンボルを送信すると現時点でのレートが返ってきます。
 取り扱いシンボル
 ビットコイン: BTC
@@ -44,6 +46,7 @@ def get_manual():
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    """Webhookからのリクエストをチェック"""
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
 
@@ -63,6 +66,7 @@ def callback():
 
 @handler.add(FollowEvent)
 def handle_follow(event):
+    """フォロー時に送信"""
     msg = '初めまして 登録ありがとう\n' + get_manual()
     line_bot_api.reply_message(
         event.reply_token,
@@ -89,12 +93,15 @@ def get_symbol_list(msg):
 
 
 @handler.add(MessageEvent, message=TextMessage)
-def re_btc(event):
+def re_message_event(event):
+    """メッセージ受信時に送信"""
     received_msg = event.message.text
     symbol_list = get_symbol_list(received_msg)
     send_msg = ''
+    # 使い方を返信
     if '使い方' in received_msg:
         send_msg += get_manual()
+    # メッセージに暗号通貨のシンボルが含まれていない時
     if not symbol_list:
         send_msg += 'メッセージに有効なシンボルが含まれていません'
     else:
