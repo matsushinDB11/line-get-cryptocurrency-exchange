@@ -61,15 +61,15 @@ def get_symbol_list(msg):
     引数 msg: 文字列型
     戻り値 文字列 リスト"""
     symbol_list = []
-    if msg in 'BTC':
+    if 'BTC' in msg:
         symbol_list.append('BTC')
-    if msg in 'ETH':
+    if 'ETH' in msg:
         symbol_list.append('ETH')
-    if msg in 'BCH':
+    if 'BCH' in msg:
         symbol_list.append('BCH')
-    if msg in 'LTC':
+    if 'LTC' in msg:
         symbol_list.append('LTC')
-    if msg in 'XRP':
+    if 'XRP' in msg:
         symbol_list.append('XRP')
     return symbol_list
 
@@ -78,13 +78,16 @@ def get_symbol_list(msg):
 def re_btc(event):
     symbol_list = get_symbol_list(event.message.text)
     re_msg = ''
-    for symbol in symbol_list:
-        symbol_path = make_symbol_path(symbol)
-        res = requests.get(endpoint + symbol_path)
-        ask = json.loads(res.text)["data"][0]["ask"]
-        bid = json.loads(res.text)["data"][0]["bid"]
-        msg = '現在' + symbol + 'のレートは\n' + 'ASK: ' + str(ask) + '\n' + 'BID: ' + str(bid)
-        re_msg += msg
+    if not symbol_list:
+        re_msg += 'メッセージに有効なシンボルが含まれていません'
+    else:
+        for symbol in symbol_list:
+            symbol_path = make_symbol_path(symbol)
+            res = requests.get(endpoint + symbol_path)
+            ask = json.loads(res.text)["data"][0]["ask"]
+            bid = json.loads(res.text)["data"][0]["bid"]
+            msg = '現在' + symbol + 'のレートは\n' + 'ASK: ' + str(ask) + '\n' + 'BID: ' + str(bid) + '\n'
+            re_msg += msg
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=re_msg)
