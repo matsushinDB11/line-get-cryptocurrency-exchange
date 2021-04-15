@@ -29,6 +29,18 @@ def index():
     return 'line-get-cryptocurrency-exchange by Matsushin'
 
 
+def re_manual():
+    msg = """暗号通貨のシンボルを送信すると現時点でのレートが返ってきます。
+取り扱いシンボル
+ビットコイン: BTC
+イーサリアム : ETH
+ビットコインキャッシュ: BCH
+ライトコイン: LTC
+リップル: XRP
+"""
+    return msg
+
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
