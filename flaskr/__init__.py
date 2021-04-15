@@ -17,7 +17,7 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 endpoint = 'https://api.coin.z.com/public'
 path = '/v1/ticker'
-symbol = 'BTC'
+# symbol = 'BTC'
 
 
 def make_symbol_path(symbol):
@@ -56,16 +56,38 @@ def handle_follow(event):
     )
 
 
+def get_symbol_list(msg):
+    """メッセージに含まれるシンボルをリストで返す
+    引数 msg: 文字列型
+    戻り値 文字列 リスト"""
+    symbol_list = []
+    if msg in 'BTC':
+        symbol_list.append('BTC')
+    if msg in 'ETH':
+        symbol_list.append('ETH')
+    if msg in 'BCH':
+        symbol_list.append('BCH')
+    if msg in 'LTC':
+        symbol_list.append('LTC')
+    if msg in 'XRP':
+        symbol_list.append('XRP')
+    return symbol_list
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def re_btc(event):
-    symbol_path = make_symbol_path(symbol)
-    res = requests.get(endpoint + symbol_path)
-    ask = json.loads(res.text)["data"][0]["ask"]
-    bid = json.loads(res.text)["data"][0]["bid"]
-    msg = '買値' + str(ask) + ' ' + '売値' + str(bid)
+    symbol_list = get_symbol_list(event.message.text)
+    re_msg = ''
+    for symbol in symbol_list:
+        symbol_path = make_symbol_path(symbol)
+        res = requests.get(endpoint + symbol_path)
+        ask = json.loads(res.text)["data"][0]["ask"]
+        bid = json.loads(res.text)["data"][0]["bid"]
+        msg = '現在' + symbol + 'のレートは\n' + 'ASK: ' + str(ask) + '\n' + 'BID: ' + str(bid)
+        re_msg += msg
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=msg)
+        TextSendMessage(text=re_msg)
     )
 
 
