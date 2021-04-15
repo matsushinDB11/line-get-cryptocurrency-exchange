@@ -1,0 +1,1 @@
+web: cd flaskr && gunicorn __init__:app --log-file -
