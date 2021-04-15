@@ -29,7 +29,7 @@ def index():
     return 'line-get-cryptocurrency-exchange by Matsushin'
 
 
-def re_manual():
+def get_manual():
     msg = """暗号通貨のシンボルを送信すると現時点でのレートが返ってきます。
 取り扱いシンボル
 ビットコイン: BTC
@@ -37,6 +37,7 @@ def re_manual():
 ビットコインキャッシュ: BCH
 ライトコイン: LTC
 リップル: XRP
+
 """
     return msg
 
@@ -88,10 +89,13 @@ def get_symbol_list(msg):
 
 @handler.add(MessageEvent, message=TextMessage)
 def re_btc(event):
-    symbol_list = get_symbol_list(event.message.text)
-    re_msg = ''
+    received_msg = event.message.text
+    symbol_list = get_symbol_list(received_msg)
+    send_msg = ''
+    if '使い方' in received_msg:
+        send_msg += get_manual()
     if not symbol_list:
-        re_msg += 'メッセージに有効なシンボルが含まれていません'
+        send_msg += 'メッセージに有効なシンボルが含まれていません'
     else:
         for symbol in symbol_list:
             symbol_path = make_symbol_path(symbol)
@@ -99,10 +103,10 @@ def re_btc(event):
             ask = json.loads(res.text)["data"][0]["ask"]
             bid = json.loads(res.text)["data"][0]["bid"]
             msg = '現在' + symbol + 'のレートは\n' + 'ASK: ' + str(ask) + '\n' + 'BID: ' + str(bid) + '\n'
-            re_msg += msg
+            send_msg += msg
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=re_msg)
+        TextSendMessage(text=send_msg)
     )
 
 
