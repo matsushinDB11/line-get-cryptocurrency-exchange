@@ -63,9 +63,10 @@ def callback():
 
 @handler.add(FollowEvent)
 def handle_follow(event):
+    msg = '初めまして 登録ありがとう\n' + get_manual()
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text='初めまして 登録ありがとう')
+        TextSendMessage(text=msg)
     )
 
 
