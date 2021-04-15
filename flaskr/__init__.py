@@ -61,15 +61,15 @@ def get_symbol_list(msg):
     引数 msg: 文字列型
     戻り値 文字列 リスト"""
     symbol_list = []
-    if msg in 'BTC':
+    if 'BTC' in msg:
         symbol_list.append('BTC')
-    if msg in 'ETH':
+    if 'ETH' in msg:
         symbol_list.append('ETH')
-    if msg in 'BCH':
+    if 'BCH' in msg:
         symbol_list.append('BCH')
-    if msg in 'LTC':
+    if 'LTC' in msg:
         symbol_list.append('LTC')
-    if msg in 'XRP':
+    if 'XRP' in msg:
         symbol_list.append('XRP')
     return symbol_list
 
